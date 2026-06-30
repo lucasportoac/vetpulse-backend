@@ -11,6 +11,7 @@ import br.com.dbc.vetpulse.ports.outbound.PetRepositoryPort;
 import br.com.dbc.vetpulse.ports.outbound.VeterinarioRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import br.com.dbc.vetpulse.domain.exception.BusinessException;
 
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class AgendamentoUseCaseImpl implements AgendamentoUseCase {
         );
 
         if (horarioOcupado) {
-            throw new IllegalArgumentException("Já existe agendamento para este veterinário neste horário.");
+            throw new BusinessException("Já existe agendamento para este veterinário neste horário.");
         }
 
         agendamento.setPet(pet);
