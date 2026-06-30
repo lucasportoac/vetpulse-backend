@@ -1,4 +1,4 @@
-package br.com.dbc.vetpulse;
+package br.com.dbc.vetpulse.adapters.outbound.persistence.repository;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
