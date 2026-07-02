@@ -7,7 +7,15 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "AGENDAMENTO")
+@Table(
+        name = "AGENDAMENTO",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "UK_AGENDAMENTO_VETERINARIO_DATA_HORA",
+                        columnNames = {"ID_VETERINARIO", "DATA_HORA"}
+                )
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor

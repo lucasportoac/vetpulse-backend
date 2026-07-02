@@ -6,6 +6,8 @@ import br.com.dbc.vetpulse.adapters.inbound.dto.VeterinarioMapper;
 import br.com.dbc.vetpulse.ports.inbound.VeterinarioUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,31 +21,39 @@ public class VeterinarioController {
     private final VeterinarioMapper mapper;
 
     @PostMapping
-    public VeterinarioDTO criar(@Valid @RequestBody VeterinarioCreateDTO veterinarioCreateDTO) {
-        return mapper.toDTO(veterinarioUseCase.criar(mapper.toDomain(veterinarioCreateDTO)));
+    public ResponseEntity<VeterinarioDTO> criar(@Valid @RequestBody VeterinarioCreateDTO veterinarioCreateDTO) {
+        VeterinarioDTO veterinarioDTO = mapper.toDTO(veterinarioUseCase.criar(mapper.toDomain(veterinarioCreateDTO)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(veterinarioDTO);
     }
 
     @GetMapping
-    public List<VeterinarioDTO> listar() {
-        return veterinarioUseCase.listar()
+    public ResponseEntity<List<VeterinarioDTO>> listar() {
+        List<VeterinarioDTO> veterinarios = veterinarioUseCase.listar()
                 .stream()
                 .map(mapper::toDTO)
                 .toList();
+
+        return ResponseEntity.ok(veterinarios);
     }
 
     @GetMapping("/{idVeterinario}")
-    public VeterinarioDTO buscarPorId(@PathVariable Integer idVeterinario) {
-        return mapper.toDTO(veterinarioUseCase.buscarPorId(idVeterinario));
+    public ResponseEntity<VeterinarioDTO> buscarPorId(@PathVariable Integer idVeterinario) {
+        return ResponseEntity.ok(mapper.toDTO(veterinarioUseCase.buscarPorId(idVeterinario)));
     }
 
     @PutMapping("/{idVeterinario}")
-    public VeterinarioDTO atualizar(@PathVariable Integer idVeterinario,
-                                    @Valid @RequestBody VeterinarioCreateDTO veterinarioCreateDTO) {
-        return mapper.toDTO(veterinarioUseCase.atualizar(idVeterinario, mapper.toDomain(veterinarioCreateDTO)));
+    public ResponseEntity<VeterinarioDTO> atualizar(@PathVariable Integer idVeterinario,
+                                                    @Valid @RequestBody VeterinarioCreateDTO veterinarioCreateDTO) {
+        VeterinarioDTO veterinarioDTO = mapper.toDTO(
+                veterinarioUseCase.atualizar(idVeterinario, mapper.toDomain(veterinarioCreateDTO))
+        );
+
+        return ResponseEntity.ok(veterinarioDTO);
     }
 
     @DeleteMapping("/{idVeterinario}")
-    public void deletar(@PathVariable Integer idVeterinario) {
+    public ResponseEntity<Void> deletar(@PathVariable Integer idVeterinario) {
         veterinarioUseCase.deletar(idVeterinario);
+        return ResponseEntity.noContent().build();
     }
 }

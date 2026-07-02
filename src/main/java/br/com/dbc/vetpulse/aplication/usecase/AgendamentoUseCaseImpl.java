@@ -12,6 +12,8 @@ import br.com.dbc.vetpulse.ports.outbound.VeterinarioRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import br.com.dbc.vetpulse.domain.exception.BusinessException;
+import br.com.dbc.vetpulse.domain.service.AgendamentoDomainService;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,9 +24,13 @@ public class AgendamentoUseCaseImpl implements AgendamentoUseCase {
     private final AgendamentoRepositoryPort agendamentoRepositoryPort;
     private final PetRepositoryPort petRepositoryPort;
     private final VeterinarioRepositoryPort veterinarioRepositoryPort;
+    private final AgendamentoDomainService agendamentoDomainService;
 
     @Override
+    @Transactional
     public Agendamento criar(Agendamento agendamento) {
+        agendamentoDomainService.validarNovoAgendamento(agendamento);
+
         Pet pet = petRepositoryPort.buscarPorId(agendamento.getPet().getIdPet())
                 .orElseThrow(() -> new ResourceNotFoundException("Pet não encontrado."));
 
@@ -36,9 +42,7 @@ public class AgendamentoUseCaseImpl implements AgendamentoUseCase {
                 agendamento.getDataHora()
         );
 
-        if (horarioOcupado) {
-            throw new BusinessException("Já existe agendamento para este veterinário neste horário.");
-        }
+        agendamentoDomainService.validarHorarioDisponivel(horarioOcupado);
 
         agendamento.setPet(pet);
         agendamento.setVeterinario(veterinario);
@@ -59,6 +63,7 @@ public class AgendamentoUseCaseImpl implements AgendamentoUseCase {
     }
 
     @Override
+    @Transactional
     public Agendamento cancelar(Integer idAgendamento) {
         Agendamento agendamento = buscarPorId(idAgendamento);
         agendamento.setStatus(StatusAgendamento.CANCELADO);

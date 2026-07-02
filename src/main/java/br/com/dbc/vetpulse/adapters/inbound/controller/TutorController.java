@@ -6,6 +6,8 @@ import br.com.dbc.vetpulse.adapters.inbound.dto.TutorMapper;
 import br.com.dbc.vetpulse.ports.inbound.TutorUseCase;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,31 +21,36 @@ public class TutorController {
     private final TutorMapper mapper;
 
     @PostMapping
-    public TutorDTO criar(@Valid @RequestBody TutorCreateDTO tutorCreateDTO) {
-        return mapper.toDTO(tutorUseCase.criar(mapper.toDomain(tutorCreateDTO)));
+    public ResponseEntity<TutorDTO> criar(@Valid @RequestBody TutorCreateDTO tutorCreateDTO) {
+        TutorDTO tutorDTO = mapper.toDTO(tutorUseCase.criar(mapper.toDomain(tutorCreateDTO)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(tutorDTO);
     }
 
     @GetMapping
-    public List<TutorDTO> listar() {
-        return tutorUseCase.listar()
+    public ResponseEntity<List<TutorDTO>> listar() {
+        List<TutorDTO> tutores = tutorUseCase.listar()
                 .stream()
                 .map(mapper::toDTO)
                 .toList();
+
+        return ResponseEntity.ok(tutores);
     }
 
     @GetMapping("/{idTutor}")
-    public TutorDTO buscarPorId(@PathVariable Integer idTutor) {
-        return mapper.toDTO(tutorUseCase.buscarPorId(idTutor));
+    public ResponseEntity<TutorDTO> buscarPorId(@PathVariable Integer idTutor) {
+        return ResponseEntity.ok(mapper.toDTO(tutorUseCase.buscarPorId(idTutor)));
     }
 
     @PutMapping("/{idTutor}")
-    public TutorDTO atualizar(@PathVariable Integer idTutor,
-                              @Valid @RequestBody TutorCreateDTO tutorCreateDTO) {
-        return mapper.toDTO(tutorUseCase.atualizar(idTutor, mapper.toDomain(tutorCreateDTO)));
+    public ResponseEntity<TutorDTO> atualizar(@PathVariable Integer idTutor,
+                                              @Valid @RequestBody TutorCreateDTO tutorCreateDTO) {
+        TutorDTO tutorDTO = mapper.toDTO(tutorUseCase.atualizar(idTutor, mapper.toDomain(tutorCreateDTO)));
+        return ResponseEntity.ok(tutorDTO);
     }
 
     @DeleteMapping("/{idTutor}")
-    public void deletar(@PathVariable Integer idTutor) {
+    public ResponseEntity<Void> deletar(@PathVariable Integer idTutor) {
         tutorUseCase.deletar(idTutor);
+        return ResponseEntity.noContent().build();
     }
 }

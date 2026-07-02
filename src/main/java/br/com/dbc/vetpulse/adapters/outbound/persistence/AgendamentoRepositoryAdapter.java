@@ -39,7 +39,9 @@ public class AgendamentoRepositoryAdapter implements AgendamentoRepositoryPort {
 
     @Override
     public boolean existeAgendamentoNoHorario(Integer idVeterinario, LocalDateTime dataHora) {
-        return agendamentoJpaRepository.existsByVeterinarioIdVeterinarioAndDataHora(idVeterinario, dataHora);
+        return agendamentoJpaRepository
+                .buscarAgendamentoPorVeterinarioEDataHoraComLock(idVeterinario, dataHora)
+                .isPresent();
     }
 
     @Override
